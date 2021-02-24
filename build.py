@@ -118,13 +118,14 @@ def publish_bintray(source, target, env):
     firmware_path = str(source[0])
     firmware_name = basename(firmware_path)
     url = "/".join([
-        "https://api.bintray.com", "content",
+        "http://0.0.0.0:3000", "content",
         user, repository, package, version, firmware_name
     ])
 
     print("Uploading {0} to Bintray. Version: {1}".format(
         firmware_name, version))
     print(url)
+    
 
     headers = {
         "Content-type": "application/octet-stream",
@@ -139,8 +140,11 @@ def publish_bintray(source, target, env):
                          data=open(firmware_path, "rb"),
                          headers=headers,
                          auth=(user,apitoken))
+                         
         r.raise_for_status()
+        
     except requests.exceptions.RequestException as e:
+        print(r.text)
         sys.stderr.write("Failed to submit package: %s\n" %
                          ("%s\n%s" % (r.status_code, r.text) if r else str(e)))
         env.Exit(1)

@@ -25,7 +25,7 @@ const BintrayClient bintray(BINTRAY_USER, BINTRAY_REPO, BINTRAY_PACKAGE);
 // usage of bintray: see https://github.com/r0oland/bintray-secure-ota
 
 // Connection port (HTTPS)
-const int port = 443;
+const int port = 3000;
 
 // Variables to validate firmware content
 int volatile contentLength = 0;
@@ -93,7 +93,7 @@ void start_ota_update() {
   }
 
   // wifi did not connect
-  ESP_LOGI(TAG, "Could not connect to %s", WIFI_SSID);
+  // ESP_LOGI(TAG, "Could not connect to %s", WIFI_SSID);
   ota_display(1, " E", "no WiFi connect");
   delay(5000);
 
@@ -145,16 +145,20 @@ int do_ota_update() {
     return -1;
   }
 
-  String currentHost = bintray.getStorageHost();
-  String prevHost = currentHost;
+  String currentHost = "192.168.178.96";
+    // String currentHost = bintray.getStorageHost();
 
-  WiFiClientSecure client;
+  String prevHost = "192.168.178.96";
 
-  client.setCACert(bintray.getCertificate(currentHost));
-  client.setTimeout(RESPONSE_TIMEOUT_MS);
+  // WiFiClientSecure client;
+    WiFiClient client;
 
-  if (!client.connect(currentHost.c_str(), port)) {
-    ESP_LOGI(TAG, "Cannot connect to %s", currentHost.c_str());
+
+  // client.setCACert(bintray.getCertificate(currentHost));
+  // client.setTimeout(RESPONSE_TIMEOUT_MS);
+
+  if (!client.connect("192.168.178.96", port)) {
+    ESP_LOGI(TAG, "Cannot connect to %s", "192.168.178.96");
     ota_display(3, " E", "connection lost");
     goto abort;
   }
@@ -162,10 +166,10 @@ int do_ota_update() {
   while (redirect) {
     if (currentHost != prevHost) {
       client.stop();
-      client.setCACert(bintray.getCertificate(currentHost));
-      if (!client.connect(currentHost.c_str(), port)) {
+      // client.setCACert(bintray.getCertificate(currentHost));
+      if (!client.connect("192.168.178.96", port)) {
         ESP_LOGI(TAG, "Redirect detected, but cannot connect to %s",
-                 currentHost.c_str());
+                 "192.168.178.96");
         ota_display(3, " E", "server error");
         goto abort;
       }
